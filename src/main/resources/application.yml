@@ -1,0 +1,23 @@
+server:
+  port: 8080   #端口号默认为8080
+
+spring:
+  application:
+    name: transactionmanager
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+      eager: true # 启动时立即连接控制台
+
+      rules:
+        - resource: /api/transactions/create
+          grade: 1 # QPS限流
+          count: 100 # 每秒100请求
+          strategy: 0 # 直接拒绝
+          controlBehavior: 0 # 快速失败
+        - resource: /api/transactions/selectById
+          grade: 2 # 错误率熔断
+          count: 50 # 错误率>50%触发
+          timeWindow: 10 # 10秒统计周期
+          minRequestAmount: 10 # 最小请求数
